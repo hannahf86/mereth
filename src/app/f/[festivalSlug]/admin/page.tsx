@@ -1,6 +1,7 @@
 import { requireFestivalStaff } from "@/lib/auth/staff";
 import { getAdminOverview } from "@/lib/db/admin-queries";
 import { formatFeePence } from "@/lib/format";
+import { EntryWindowControl } from "@/components/admin/entry-window-control";
 
 // A.01-ish — admin overview.
 export default async function AdminOverview({
@@ -37,6 +38,12 @@ export default async function AdminOverview({
           </div>
         ))}
       </div>
+      <EntryWindowControl
+        festivalSlug={festival.slug}
+        status={edition.status}
+        entriesOpenAt={edition.entries_open_at}
+        entriesCloseAt={edition.entries_close_at}
+      />
     </div>
   );
 }

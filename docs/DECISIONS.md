@@ -130,7 +130,11 @@ Running log of decisions and why. Newest at the top of each section.
   entries table, CSV export and all admin views honour this.
 - Built & verified: overview (counts), entries list + CSV export, syllabus list
   + class create/edit (the syllabus builder; writes via the session client so
-  RLS enforces staff-only). Next: festival setup + theme, entry-window control.
+  RLS enforces staff-only), and festival setup + theme (owner-only; theme edited
+  with colour pickers, validated for AA contrast server-side, and applied live to
+  the public site via the festivals.theme JSONB), and entry-window control
+  (edition status + open/close dates; closing it blocks new entries via the
+  entrant flow's server-side checks). Admin basics (step 5) is complete.
 - `/dev/login?festival=<slug>&role=<role>` grants a festival role for local
   testing of admin/steward flows (dev only).
 

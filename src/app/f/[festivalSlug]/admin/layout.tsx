@@ -14,6 +14,7 @@ export default async function AdminLayout({
     { href: base, label: "Overview" },
     { href: `${base}/entries`, label: "Entries" },
     { href: `${base}/syllabus`, label: "Syllabus" },
+    { href: `${base}/settings`, label: "Settings" },
   ];
 
   return (
