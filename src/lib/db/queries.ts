@@ -4,6 +4,15 @@ import { createClient } from "@/lib/db/supabase/server";
 // (festivals/editions readable by all; classes readable when published), so the
 // ordinary server client (anon context) is enough — no service role needed.
 
+export async function getFestivals() {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("festivals")
+    .select("id, name, slug")
+    .order("name");
+  return data ?? [];
+}
+
 export async function getFestivalBySlug(slug: string) {
   const supabase = await createClient();
   const { data } = await supabase
