@@ -43,6 +43,26 @@ export async function GET(request: Request) {
     .from("profiles")
     .upsert({ id: userId, email, full_name: "Test Parent" });
 
+  // Optionally grant a festival role for testing admin/steward flows:
+  // /dev/login?festival=alderford&role=owner
+  const festivalSlug = searchParams.get("festival");
+  const role = searchParams.get("role");
+  if (festivalSlug && role) {
+    const { data: fest } = await admin
+      .from("festivals")
+      .select("id")
+      .eq("slug", festivalSlug)
+      .maybeSingle();
+    if (fest) {
+      await admin
+        .from("festival_members")
+        .upsert(
+          { festival_id: fest.id, profile_id: userId, role: role as never },
+          { onConflict: "festival_id,profile_id,role" },
+        );
+    }
+  }
+
   const supabase = await createClient();
   const { error: verifyError } = await supabase.auth.verifyOtp({
     email,

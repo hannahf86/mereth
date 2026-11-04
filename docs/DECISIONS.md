@@ -120,6 +120,20 @@ Running log of decisions and why. Newest at the top of each section.
     printed `whsec_…`. Pay with test card `4242 4242 4242 4242`.
 - Confirmation/receipt **emails are not wired yet** (Resend) — a follow-up.
 
+## Admin (step 5, in progress)
+
+- `/f/[slug]/admin/*` is gated by `requireFestivalStaff` (owner/secretary); the
+  admin layout and every admin page/route call it.
+- Admin data reads use the **service role** (`admin-queries.ts`) because
+  competitors are owner-only under RLS, yet staff need names to run the festival.
+  Queries are always festival-scoped and project **names only, never DOB** — the
+  entries table, CSV export and all admin views honour this.
+- Built & verified: overview (counts), entries list + CSV export, syllabus list
+  + class create/edit (the syllabus builder; writes via the session client so
+  RLS enforces staff-only). Next: festival setup + theme, entry-window control.
+- `/dev/login?festival=<slug>&role=<role>` grants a festival role for local
+  testing of admin/steward flows (dev only).
+
 ## Stack
 
 Next.js 16.4.5 (App Router, TS strict, Turbopack) · Tailwind v4 · Supabase

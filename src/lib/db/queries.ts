@@ -65,6 +65,31 @@ export async function getBasketCount(festivalId: string): Promise<number> {
   return count ?? 0;
 }
 
+// Global disciplines reference (public).
+export async function getDisciplines() {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("disciplines")
+    .select("id, name")
+    .order("sort_order");
+  return data ?? [];
+}
+
+// The current user's roles in a festival (empty if not a member).
+export async function getMyFestivalRoles(festivalId: string): Promise<string[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data } = await supabase
+    .from("festival_members")
+    .select("role")
+    .eq("festival_id", festivalId)
+    .eq("profile_id", user.id);
+  return (data ?? []).map((r) => r.role);
+}
+
 // A single order by its human reference (RLS restricts to the payer / staff).
 export async function getOrderByReference(festivalId: string, reference: string) {
   const supabase = await createClient();
