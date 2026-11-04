@@ -1,69 +1,75 @@
-import Image from "next/image";
+import { themeToCssVars } from "@/lib/theme/theme";
 
-export default function Home() {
+// Foundations check — not a product screen. Proves that fonts, the semantic
+// colour tokens (as Tailwind utilities), and runtime white-label re-theming all
+// work end to end. Will be replaced by the Mereth marketing/entry home later.
+
+// A sample festival theme override, applied via inline CSS variables to show
+// that the SAME utilities re-theme with no component changes.
+const SAMPLE_FESTIVAL_THEME = themeToCssVars({
+  "brand-primary": "#3b2a6b",
+  "brand-primary-hover": "#2c1f52",
+  "brand-accent": "#9c2a5b",
+  "brand-accent-hover": "#7f2049",
+  "bg-page": "#faf7f2",
+  "text-heading": "#2c1f52",
+});
+
+function Swatch({ className, label }: { className: string; label: string }) {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="flex flex-col gap-2xs">
+      <div className={`h-16 rounded-md border border-border-default ${className}`} />
+      <span className="text-sm text-text-secondary">{label}</span>
     </div>
+  );
+}
+
+function Demo({ heading }: { heading: string }) {
+  return (
+    <section className="flex flex-col gap-md rounded-lg border border-border-default bg-bg-surface p-lg">
+      <h2 className="text-2xl font-semibold">{heading}</h2>
+      <div className="flex flex-wrap gap-sm">
+        <button className="rounded-md bg-brand-primary px-lg py-sm font-bold text-brand-on-primary transition-colors hover:bg-brand-primary-hover">
+          Enter this class
+        </button>
+        <button className="rounded-md bg-brand-accent px-lg py-sm font-bold text-brand-on-primary transition-colors hover:bg-brand-accent-hover">
+          Pay £14.00
+        </button>
+        <button className="rounded-md border border-brand-primary px-lg py-sm font-bold text-brand-primary transition-colors hover:bg-brand-primary-soft">
+          View syllabus
+        </button>
+      </div>
+      <div className="grid grid-cols-3 gap-sm sm:grid-cols-6">
+        <Swatch className="bg-brand-primary" label="primary" />
+        <Swatch className="bg-brand-primary-soft" label="primary soft" />
+        <Swatch className="bg-brand-accent" label="accent" />
+        <Swatch className="bg-feedback-success" label="success" />
+        <Swatch className="bg-feedback-warning" label="warning" />
+        <Swatch className="bg-feedback-error" label="error" />
+      </div>
+    </section>
+  );
+}
+
+export default function FoundationsCheck() {
+  return (
+    <main className="mx-auto flex w-full max-w-4xl flex-col gap-xl px-md py-2xl">
+      <header className="flex flex-col gap-2xs">
+        <span className="text-sm font-bold uppercase tracking-widest text-text-secondary">
+          Mereth · foundations
+        </span>
+        <h1 className="text-4xl font-semibold">Headings are Maven Pro</h1>
+        <p className="max-w-prose text-lg text-text-secondary">
+          Body and UI text are Lato. These colours, spacing and radii come from
+          the design tokens — defined once and re-themed per festival at runtime.
+        </p>
+      </header>
+
+      <Demo heading="Mereth default theme" />
+
+      <div style={SAMPLE_FESTIVAL_THEME}>
+        <Demo heading="Sample festival theme (same components)" />
+      </div>
+    </main>
   );
 }

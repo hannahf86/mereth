@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  Mereth design tokens
+  --------------------
+  Semantic tokens live in Tailwind's @theme so that:
+    1) they are emitted as CSS custom properties on :root, and
+    2) every colour utility (bg-brand-primary, text-text-primary, …) resolves
+       to var(--color-…), so a festival theme can override the variable on its
+       layout root at runtime and the whole subtree re-themes.
+
+  Values below are the Mereth DEFAULT theme.
+  Source: Figma "Mereth – Design" ▸ Branding ▸ Colour (file i03fec41fkStLxjWvvTC8B).
+
+  IMPORTANT: do NOT switch these colours to `@theme inline` — inline bakes the
+  literal value into each utility and would break runtime white-labelling.
+*/
+@theme {
+  /* Fonts (variables set by next/font in layout.tsx) */
+  --font-heading: var(--font-maven-pro), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-lato), ui-sans-serif, system-ui, sans-serif;
+
+  /* Surfaces */
+  --color-bg-page: #f7f2e8; /* cream */
+  --color-bg-surface: #ffffff;
+  --color-bg-subtle: #eef0ef; /* grey 100 */
+
+  /* Brand — primary (teal) */
+  --color-brand-primary: #0f4c4f; /* teal 700 */
+  --color-brand-primary-hover: #0b3a3c; /* teal 900 */
+  --color-brand-primary-soft: #d6e8e7; /* teal 100 */
+  --color-brand-on-primary: #ffffff;
+
+  /* Brand — accent (coral; used for payment actions) */
+  --color-brand-accent: #c94a35; /* coral 600 */
+  --color-brand-accent-hover: #ab3f2d; /* derived darker coral */
+  --color-brand-accent-soft: #fbe2dc; /* coral 100 */
+  --color-brand-highlight: #e2604a; /* coral 500 — illustration only */
+
+  /* Text */
+  --color-text-primary: #1c2426; /* ink */
+  --color-text-secondary: #5b6668; /* grey 600 */
+  --color-text-heading: #0b3a3c; /* teal 900 */
+  --color-text-inverse: #f7f2e8; /* cream — soft inverse text on brand surfaces */
+
+  /* Borders */
+  --color-border-default: #c9cfcf; /* grey 300 */
+  --color-border-focus: #0f4c4f; /* teal 700 */
+
+  /* Feedback */
+  --color-feedback-success: #2e7d4f;
+  --color-feedback-success-soft: #e3f0e8; /* derived tint */
+  --color-feedback-warning: #9a6512;
+  --color-feedback-warning-soft: #f6ecd8; /* derived tint */
+  --color-feedback-error: #b3261e;
+  --color-feedback-error-soft: #f8e2e0; /* derived tint */
+
+  /* Spacing scale */
+  --spacing-2xs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Radius scale */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  /* Border widths */
+  --border-default: 1px;
+  --border-strong: 2px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ---- Base document styles ----
+   These MUST live in @layer base: Tailwind v4 puts utilities in a cascade layer,
+   and unlayered element rules would beat utilities (e.g. a heading's text colour
+   would override text-* utilities). In @layer base, utilities win as intended. */
+@layer base {
+  body {
+    background-color: var(--color-bg-page);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    color: var(--color-text-heading);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Accessibility: visible focus ring for keyboard users (WCAG 2.2 AA, 2.4.7).
+   Kept unlayered so it reliably applies over component styles. */
+:focus-visible {
+  outline: var(--border-strong) solid var(--color-border-focus);
+  outline-offset: 2px;
 }
