@@ -20,12 +20,20 @@ export function FestivalHeader({
       >
         {festivalName}
       </Link>
-      <Link
-        href={`/f/${slug}/basket`}
-        className={buttonClasses("secondary", "sm")}
-      >
-        Basket ({basketCount})
-      </Link>
+      <nav className="flex items-center gap-md">
+        <Link
+          href={`/f/${slug}/timetable`}
+          className="text-sm font-bold text-brand-primary hover:underline"
+        >
+          Timetable
+        </Link>
+        <Link
+          href={`/f/${slug}/basket`}
+          className={buttonClasses("secondary", "sm")}
+        >
+          Basket ({basketCount})
+        </Link>
+      </nav>
     </header>
   );
 }
