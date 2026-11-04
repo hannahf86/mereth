@@ -33,19 +33,14 @@ export default async function FestivalLayout({
       />
       <div className="flex flex-1 flex-col">{children}</div>
       <footer className="border-t border-border-default bg-bg-surface px-lg py-lg">
-        <div className="mx-auto w-full max-w-3xl">
-          {festival.contact_email ? (
-            <Link
-              href={`mailto:${festival.contact_email}`}
-              className="text-sm text-brand-primary hover:underline"
-            >
-              Need help? Contact the festival
-            </Link>
-          ) : (
-            <span className="text-sm text-text-secondary">
-              Need help? Contact the festival
-            </span>
-          )}
+        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-md">
+          <Link
+            href={`/f/${festival.slug}/contact`}
+            className="text-sm text-brand-primary hover:underline"
+          >
+            Need help? Contact the festival
+          </Link>
+          <span className="text-sm text-text-secondary">Powered by Mereth</span>
         </div>
       </footer>
     </div>

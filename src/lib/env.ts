@@ -53,3 +53,11 @@ export function getStripeWebhookSecret(): string {
   if (!key) throw new Error("Missing STRIPE_WEBHOOK_SECRET (server-only).");
   return key;
 }
+
+// Email (Resend) is optional — features degrade gracefully when unset.
+export function getResendApiKey(): string | null {
+  return process.env.RESEND_API_KEY ?? null;
+}
+export function getEmailFrom(): string | null {
+  return process.env.EMAIL_FROM ?? null;
+}
