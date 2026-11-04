@@ -174,6 +174,33 @@ Full text in `docs/BRIEF-UPDATE-01.md`. Decisions:
   relying on the Connect entry-payment build drafted in step 4.
 - **Phasing** — March vs summer 2027 per update §7.
 
+## Brief update 02 (Nov 2026 — supersedes conflicting parts)
+
+Full text in `docs/BRIEF-UPDATE-02.md`. Decisions:
+- **Responsibility boundaries** — Mereth doesn't process paper forms, move offline
+  money, decide refunds, or own document delivery; festivals do. Help text/empty
+  states say so kindly.
+- **Photo/video consent per edition** — new `competitor_edition_consents` table
+  (media_consent + results_name_consent, history, given_by/at); required Yes/No
+  question at entry; consent column + event-day banners; "No photos" marker on
+  steward / running-order PDFs; festival photography-policy setting.
+- **Admin-entered entries** — "Add entry" on behalf; `entries.source` =
+  online|admin; eligibility override with recorded reason (audit).
+- **Offline payments** — mark an order/entry paid by cheque/cash/transfer (ref +
+  date); undo with reason; bulk; payment method shown in CSV/reports. Confirms
+  entries like a Stripe payment.
+- **Withdrawals + refunds** — admin withdraw with reason + optional refund record
+  (amount/method/date); remove from unpublished running orders; warn after publish;
+  Stripe-refund button is a summer item.
+- **Festival pack** — ZIP of all current PDFs by day/venue + out-of-date flags
+  (depends on PDF generation, step 7); pre-festival checklist is summer.
+- **UK data residency** — Supabase London (eu-west-2) + Vercel lhr1; Pro backups +
+  tested restore runbook; data-export ZIP of CSVs (audit-logged); uptime/error
+  monitoring with no PII. VERIFY the existing project's region; a new London project
+  may be needed.
+- **Legal** — `docs/LEGAL-TODO.md` created.
+- Phasing per update 02 §6.
+
 ## Stack
 
 Next.js 16.4.5 (App Router, TS strict, Turbopack) · Tailwind v4 · Supabase
