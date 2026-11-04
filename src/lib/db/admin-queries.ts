@@ -30,6 +30,110 @@ export async function getAdminOverview(festivalId: string, editionId: string) {
   };
 }
 
+export async function getRooms(festivalId: string) {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("rooms")
+    .select("id, name, venues(name)")
+    .eq("festival_id", festivalId)
+    .order("name");
+  return (data ?? []).map((r) => {
+    const v = Array.isArray(r.venues) ? r.venues[0] : r.venues;
+    return { id: r.id, name: r.name, venue: v?.name ?? "" };
+  });
+}
+
+export async function getSessions(festivalId: string) {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("sessions")
+    .select("id, starts_at, ends_at, rooms(name, venues(name))")
+    .eq("festival_id", festivalId)
+    .order("starts_at");
+  return (data ?? []).map((s) => {
+    const room = Array.isArray(s.rooms) ? s.rooms[0] : s.rooms;
+    const venue = room
+      ? Array.isArray(room.venues)
+        ? room.venues[0]
+        : room.venues
+      : null;
+    return {
+      id: s.id,
+      startsAt: s.starts_at,
+      endsAt: s.ends_at,
+      room: room?.name ?? "",
+      venue: venue?.name ?? "",
+    };
+  });
+}
+
+export async function getSchedulableClasses(
+  festivalId: string,
+  editionId: string,
+) {
+  const admin = createAdminClient();
+  const { data: classes } = await admin
+    .from("classes")
+    .select("id, code, title, scheduled_classes(starts_at)")
+    .eq("edition_id", editionId)
+    .order("code");
+  const { data: entries } = await admin
+    .from("entries")
+    .select("class_id, status")
+    .eq("festival_id", festivalId);
+  const counts = new Map<string, number>();
+  for (const e of entries ?? []) {
+    if (e.status !== "withdrawn" && e.status !== "refunded") {
+      counts.set(e.class_id, (counts.get(e.class_id) ?? 0) + 1);
+    }
+  }
+  return (classes ?? []).map((c) => {
+    const sc = Array.isArray(c.scheduled_classes)
+      ? c.scheduled_classes[0]
+      : c.scheduled_classes;
+    return {
+      id: c.id,
+      code: c.code,
+      title: c.title,
+      entryCount: counts.get(c.id) ?? 0,
+      scheduledAt: sc?.starts_at ?? null,
+    };
+  });
+}
+
+export type ScheduledSlot = {
+  entryId: string;
+  competitorId: string;
+  competitorName: string;
+  startsAt: string;
+  label: string;
+};
+
+export async function getScheduledSlots(
+  festivalId: string,
+): Promise<ScheduledSlot[]> {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("entries")
+    .select("id, competitor_id, scheduled_time, classes(code), competitors(first_name, last_name)")
+    .eq("festival_id", festivalId)
+    .not("scheduled_time", "is", null)
+    .not("status", "in", "(withdrawn,refunded)");
+  return (data ?? []).map((e) => {
+    const cls = Array.isArray(e.classes) ? e.classes[0] : e.classes;
+    const comp = Array.isArray(e.competitors)
+      ? e.competitors[0]
+      : e.competitors;
+    return {
+      entryId: e.id,
+      competitorId: e.competitor_id,
+      competitorName: comp ? `${comp.first_name} ${comp.last_name}` : "",
+      startsAt: e.scheduled_time as string,
+      label: cls?.code ?? "",
+    };
+  });
+}
+
 export async function getAdminClassById(festivalId: string, classId: string) {
   const admin = createAdminClient();
   const { data } = await admin

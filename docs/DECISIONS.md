@@ -135,6 +135,18 @@ Running log of decisions and why. Newest at the top of each section.
   the public site via the festivals.theme JSONB), and entry-window control
   (edition status + open/close dates; closing it blocks new entries via the
   entrant flow's server-side checks). Admin basics (step 5) is complete.
+
+## Scheduling (step 6, complete)
+
+- Domain logic (pure, tested): running-order generation (entry order / alphabetical
+  / seeded random), time allocation (time limit + changeover), clash detection
+  (same competitor within a buffer, across venues).
+- Admin scheduling: create sessions (room + times), schedule a class into a session
+  (generates the running order, writes scheduled_classes + each entry's
+  position/time), clash warnings (30-min buffer), publish the timetable (edition →
+  timetable_published). Reads/writes via the service role, staff-gated, names only.
+- Steps 1–6 (foundations, schema/RLS, entrant flow, payments, admin, scheduling) —
+  the March-MVP core — are complete. Remaining: the brief-update-01 March items.
 - `/dev/login?festival=<slug>&role=<role>` grants a festival role for local
   testing of admin/steward flows (dev only).
 
