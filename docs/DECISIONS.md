@@ -138,6 +138,30 @@ Running log of decisions and why. Newest at the top of each section.
 - `/dev/login?festival=<slug>&role=<role>` grants a festival role for local
   testing of admin/steward flows (dev only).
 
+## Brief update 01 (Nov 2026 — supersedes conflicting parts of the original brief)
+
+Full text in `docs/BRIEF-UPDATE-01.md`. Decisions:
+- **Webflow removed entirely** — drop `webflow_sync` and the Webflow ids; remove
+  `WEBFLOW_TOKEN_ENCRYPTION_KEY`. Mereth serves the public festival sites itself.
+- **Mereth-served public sites** — home, syllabus, class, timetable, results,
+  venues, news, FAQ, about, contact; SSR/SSG + on-demand revalidation; full SEO
+  (titles/meta/OG/canonical/sitemap/robots/structured data); custom domains via
+  Vercel (`festival_domains` + host resolution in middleware); "Powered by Mereth".
+- **Self-serve theme editor** — pick primary + accent, derive hover/soft/on tokens;
+  logo upload (header/favicon/OG); live contrast check with nearest-passing-shade;
+  live preview. (Supersedes the manual all-token editor just built.)
+- **Yearly cycle** — edition rollover and spreadsheet import (syllabus/venues).
+- **Page content editor** — structured fields: `pages`, versioned `page_content`,
+  `news_posts`, `faqs`, `sponsors`, `media` (alt text required). Limited rich text.
+- **Change-requests portal** — `change_requests` + `change_request_events`; Resend
+  emails to `MERETH_SUPPORT_EMAIL` + requester; optional signed webhook.
+- **Billing** — annual subscription tiers (Bronze–Diamond) from the previous
+  year's confirmed entries + £100 setup; config table + `festival_subscriptions`;
+  May Stripe Invoicing from Mereth's own account; never feature-gate by tier.
+- **Entry payments (Stripe Connect vs Mereth-collect) still OPEN** — confirm before
+  relying on the Connect entry-payment build drafted in step 4.
+- **Phasing** — March vs summer 2027 per update §7.
+
 ## Stack
 
 Next.js 16.4.5 (App Router, TS strict, Turbopack) · Tailwind v4 · Supabase
