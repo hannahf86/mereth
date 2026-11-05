@@ -12,6 +12,7 @@ export async function GET(request: Request) {
 
   const { searchParams, origin } = new URL(request.url);
   const email = searchParams.get("email") ?? "tester@mereth.dev";
+  const fullName = searchParams.get("name") ?? "Test Parent";
   const next = searchParams.get("next") ?? "/";
 
   const admin = createAdminClient();
@@ -21,7 +22,7 @@ export async function GET(request: Request) {
     .createUser({
       email,
       email_confirm: true,
-      user_metadata: { full_name: "Test Parent" },
+      user_metadata: { full_name: fullName },
     })
     .catch(() => {});
 
@@ -41,7 +42,7 @@ export async function GET(request: Request) {
   // Ensure a profile row exists (the auto-create trigger may not be applied yet).
   await admin
     .from("profiles")
-    .upsert({ id: userId, email, full_name: "Test Parent" });
+    .upsert({ id: userId, email, full_name: fullName });
 
   // Optionally grant a festival role for testing admin/steward flows:
   // /dev/login?festival=alderford&role=owner

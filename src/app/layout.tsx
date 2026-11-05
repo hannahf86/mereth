@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Maven_Pro, Lato } from "next/font/google";
 import "./globals.css";
+import { DevToolbar } from "@/components/dev/dev-toolbar";
 
 // Headings — Maven Pro (variable weight). Exposed as --font-maven-pro.
 const mavenPro = Maven_Pro({
@@ -30,7 +31,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en-GB"
       className={`${mavenPro.variable} ${lato.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body
+        className={`min-h-full flex flex-col${
+          process.env.NODE_ENV === "development" ? " pb-20" : ""
+        }`}
+      >
+        {children}
+        <DevToolbar />
+      </body>
     </html>
   );
 }
