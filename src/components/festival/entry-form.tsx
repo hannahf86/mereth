@@ -19,8 +19,11 @@ const fieldClass =
   "min-h-[44px] w-full rounded-md border border-border-default bg-bg-surface px-md py-sm text-base text-text-primary";
 const labelClass = "text-sm font-bold tracking-[0.1px] text-text-primary";
 
-// P.04 Who is performing — pick or add a competitor, confirm repertoire and
-// accompanist, then add to the basket. Eligibility is previewed here and
+const DEFAULT_PHOTO_POLICY =
+  "Images may be used to promote the festival — in its programme, on its website and on social media.";
+
+// P.04 Who is performing — pick/add a competitor, record consent (per edition),
+// confirm repertoire and accompanist, add to basket. Eligibility and consent are
 // re-checked server-side.
 export function EntryForm({
   festivalSlug,
@@ -34,6 +37,7 @@ export function EntryForm({
   ageMin,
   ageMax,
   competitors,
+  photoPolicy,
 }: {
   festivalSlug: string;
   classCode: string;
@@ -46,6 +50,7 @@ export function EntryForm({
   ageMin: number | null;
   ageMax: number | null;
   competitors: Competitor[];
+  photoPolicy: string | null;
 }) {
   const router = useRouter();
   const [mode, setMode] = useState<"existing" | "new">(
@@ -55,18 +60,21 @@ export function EntryForm({
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dob, setDob] = useState("");
-  const [consent, setConsent] = useState(false);
   const [ownTitle, setOwnTitle] = useState("");
   const [ownComposer, setOwnComposer] = useState("");
   const [accompanistChoice, setAccompanistChoice] = useState("");
+  const [mediaConsent, setMediaConsent] = useState<"granted" | "refused" | "">(
+    "",
+  );
+  const [resultsNameConsent, setResultsNameConsent] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [status, setStatus] = useState<"idle" | "busy" | "error">("idle");
   const [error, setError] = useState("");
 
-  const activeDob =
-    mode === "existing"
-      ? competitors.find((c) => c.id === competitorId)?.dob
-      : dob;
+  const selected = competitors.find((c) => c.id === competitorId);
+  const activeDob = mode === "existing" ? selected?.dob : dob;
+  const activeFirstName =
+    (mode === "existing" ? selected?.firstName : firstName)?.trim() || "this competitor";
 
   const eligibility = useMemo(
     () =>
@@ -80,6 +88,7 @@ export function EntryForm({
   const canSubmit =
     confirmed &&
     eligibility?.eligible === true &&
+    mediaConsent !== "" &&
     (mode === "existing"
       ? competitorId !== ""
       : firstName.trim() !== "" && lastName.trim() !== "" && dob !== "") &&
@@ -88,18 +97,19 @@ export function EntryForm({
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (mediaConsent === "") return;
     setStatus("busy");
     const res = await createBasketEntry({
       festivalSlug,
       classCode,
       competitorId: mode === "existing" ? competitorId : undefined,
       newCompetitor:
-        mode === "new"
-          ? { firstName, lastName, dob, consent }
-          : undefined,
+        mode === "new" ? { firstName, lastName, dob } : undefined,
       pieceTitle: needsPiece ? ownTitle : undefined,
       pieceComposer: needsPiece ? ownComposer : undefined,
       accompanistChoice: accompanistChoice || undefined,
+      mediaConsent,
+      resultsNameConsent,
     });
     if (res.ok) {
       router.push(res.redirect);
@@ -187,17 +197,6 @@ export function EntryForm({
               publicly.
             </p>
           </div>
-          <label className="flex items-start gap-sm">
-            <input
-              type="checkbox"
-              className="mt-1"
-              checked={consent}
-              onChange={(e) => setConsent(e.target.checked)}
-            />
-            <span className="text-sm text-text-secondary">
-              Show this competitor&apos;s name in published results (optional).
-            </span>
-          </label>
         </div>
       ) : null}
 
@@ -270,6 +269,50 @@ export function EntryForm({
           ) : null}
         </Select>
       ) : null}
+
+      {/* Photo & video consent (required) */}
+      <fieldset className="flex flex-col gap-sm rounded-md border border-border-default p-md">
+        <legend className="px-xs text-base font-bold text-text-heading">
+          Photos and video
+        </legend>
+        <p className="text-sm text-text-primary">
+          Can the festival take photos or video of {activeFirstName} performing?
+        </p>
+        <p className="text-sm text-text-secondary">
+          {photoPolicy || DEFAULT_PHOTO_POLICY}
+        </p>
+        <div className="flex gap-sm">
+          <label className="flex items-center gap-xs">
+            <input
+              type="radio"
+              name="mediaConsent"
+              checked={mediaConsent === "granted"}
+              onChange={() => setMediaConsent("granted")}
+            />
+            <span className="text-base text-text-primary">Yes</span>
+          </label>
+          <label className="flex items-center gap-xs">
+            <input
+              type="radio"
+              name="mediaConsent"
+              checked={mediaConsent === "refused"}
+              onChange={() => setMediaConsent("refused")}
+            />
+            <span className="text-base text-text-primary">No</span>
+          </label>
+        </div>
+        <label className="mt-xs flex items-start gap-sm">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={resultsNameConsent}
+            onChange={(e) => setResultsNameConsent(e.target.checked)}
+          />
+          <span className="text-sm text-text-secondary">
+            Show their name in published results (optional).
+          </span>
+        </label>
+      </fieldset>
 
       {/* Confirm */}
       <label className="flex items-start gap-sm">

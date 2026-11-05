@@ -52,6 +52,7 @@ export default async function AdminEntries({
                 <th className="p-sm font-bold">Competitor</th>
                 <th className="p-sm font-bold">Piece</th>
                 <th className="p-sm font-bold">Status</th>
+                <th className="p-sm font-bold">Photos</th>
               </tr>
             </thead>
             <tbody>
@@ -67,6 +68,15 @@ export default async function AdminEntries({
                     <Badge tone={STATUS_TONE[e.status] ?? "neutral"}>
                       {STATUS_LABEL[e.status] ?? e.status}
                     </Badge>
+                  </td>
+                  <td className="p-sm">
+                    {e.mediaConsent === "granted" ? (
+                      <Badge tone="success">Yes</Badge>
+                    ) : e.mediaConsent === "refused" ? (
+                      <Badge tone="error">No</Badge>
+                    ) : (
+                      <span className="text-text-secondary">—</span>
+                    )}
                   </td>
                 </tr>
               ))}

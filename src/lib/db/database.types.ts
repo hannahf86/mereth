@@ -576,6 +576,7 @@ export type Database = {
           id: string
           logo_path: string | null
           name: string
+          photo_policy: string | null
           slug: string
           theme: Json
           updated_at: string
@@ -586,6 +587,7 @@ export type Database = {
           id?: string
           logo_path?: string | null
           name: string
+          photo_policy?: string | null
           slug: string
           theme?: Json
           updated_at?: string
@@ -596,9 +598,43 @@ export type Database = {
           id?: string
           logo_path?: string | null
           name?: string
+          photo_policy?: string | null
           slug?: string
           theme?: Json
           updated_at?: string
+        }
+        Relationships: []
+      }
+      competitor_edition_consents: {
+        Row: {
+          competitor_id: string
+          edition_id: string
+          festival_id: string
+          given_at: string
+          given_by: string | null
+          id: string
+          media_consent: string
+          results_name_consent: boolean
+        }
+        Insert: {
+          competitor_id: string
+          edition_id: string
+          festival_id: string
+          given_at?: string
+          given_by?: string | null
+          id?: string
+          media_consent: string
+          results_name_consent?: boolean
+        }
+        Update: {
+          competitor_id?: string
+          edition_id?: string
+          festival_id?: string
+          given_at?: string
+          given_by?: string | null
+          id?: string
+          media_consent?: string
+          results_name_consent?: boolean
         }
         Relationships: []
       }

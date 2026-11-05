@@ -17,6 +17,7 @@ const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/);
 export type FestivalSettingsInput = {
   name: string;
   contactEmail: string;
+  photoPolicy: string;
   theme: Record<string, string>;
 };
 
@@ -64,7 +65,12 @@ export async function updateFestivalSettings(
 
   const { error } = await supabase
     .from("festivals")
-    .update({ name, contact_email: contactEmail || null, theme })
+    .update({
+      name,
+      contact_email: contactEmail || null,
+      photo_policy: input.photoPolicy.trim() || null,
+      theme,
+    })
     .eq("id", festival.id);
   if (error) return { ok: false, error: "We couldn't save the settings." };
 

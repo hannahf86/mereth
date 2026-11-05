@@ -17,7 +17,7 @@ export async function getFestivalBySlug(slug: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("festivals")
-    .select("id, name, slug, contact_email, logo_path, theme")
+    .select("id, name, slug, contact_email, logo_path, theme, photo_policy")
     .eq("slug", slug)
     .maybeSingle();
   return data;

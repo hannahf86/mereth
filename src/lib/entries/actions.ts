@@ -17,7 +17,6 @@ const newCompetitorSchema = z.object({
   firstName: z.string().trim().min(1).max(100),
   lastName: z.string().trim().min(1).max(100),
   dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  consent: z.boolean(),
 });
 
 export type CreateBasketEntryInput = {
@@ -28,11 +27,13 @@ export type CreateBasketEntryInput = {
     firstName: string;
     lastName: string;
     dob: string;
-    consent: boolean;
   };
   pieceTitle?: string;
   pieceComposer?: string;
   accompanistChoice?: string;
+  // Consent for this edition (brief update 02 §2).
+  mediaConsent: "granted" | "refused";
+  resultsNameConsent: boolean;
 };
 
 // P.04 add-to-basket. All rules are enforced here server-side: entries window,
@@ -56,6 +57,10 @@ export async function createBasketEntry(
   const cls = await getPublishedClassByCode(edition.id, input.classCode);
   if (!cls) return { ok: false, error: "Class not found." };
 
+  if (input.mediaConsent !== "granted" && input.mediaConsent !== "refused") {
+    return { ok: false, error: "Please answer the photo and video question." };
+  }
+
   // Resolve the competitor (existing, or create a new one owned by the user).
   let competitorId = input.competitorId;
   let dob: string;
@@ -67,6 +72,10 @@ export async function createBasketEntry(
       .maybeSingle();
     if (!comp) return { ok: false, error: "We couldn't find that competitor." };
     dob = comp.date_of_birth;
+    await supabase
+      .from("competitors")
+      .update({ results_name_consent: input.resultsNameConsent })
+      .eq("id", competitorId);
   } else {
     const parsed = newCompetitorSchema.safeParse(input.newCompetitor);
     if (!parsed.success) {
@@ -80,7 +89,7 @@ export async function createBasketEntry(
         first_name: parsed.data.firstName,
         last_name: parsed.data.lastName,
         date_of_birth: parsed.data.dob,
-        results_name_consent: parsed.data.consent,
+        results_name_consent: input.resultsNameConsent,
       })
       .select("id")
       .single();
@@ -99,6 +108,21 @@ export async function createBasketEntry(
   });
   if (!eligibility.eligible) {
     return { ok: false, error: eligibility.reason };
+  }
+
+  // Record consent for this edition (kept as history; latest is current).
+  const { error: consentError } = await supabase
+    .from("competitor_edition_consents")
+    .insert({
+      festival_id: festival.id,
+      edition_id: edition.id,
+      competitor_id: competitorId,
+      media_consent: input.mediaConsent,
+      results_name_consent: input.resultsNameConsent,
+      given_by: user.id,
+    });
+  if (consentError) {
+    return { ok: false, error: "We couldn't record consent. Please try again." };
   }
 
   // Repertoire: set piece is fixed; own choice requires a title.

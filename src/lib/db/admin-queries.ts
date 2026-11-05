@@ -163,6 +163,7 @@ export type AdminEntry = {
   competitor: string;
   piece: string | null;
   createdAt: string;
+  mediaConsent: "granted" | "refused" | null;
 };
 
 export async function getAdminEntries(festivalId: string): Promise<AdminEntry[]> {
@@ -170,10 +171,24 @@ export async function getAdminEntries(festivalId: string): Promise<AdminEntry[]>
   const { data } = await admin
     .from("entries")
     .select(
-      "id, status, piece_title, created_at, classes(code, title), competitors(first_name, last_name)",
+      "id, status, piece_title, created_at, competitor_id, classes(code, title), competitors(first_name, last_name)",
     )
     .eq("festival_id", festivalId)
     .order("created_at", { ascending: false });
+
+  // Latest media consent per competitor (newest given_at wins).
+  const { data: consents } = await admin
+    .from("competitor_edition_consents")
+    .select("competitor_id, media_consent, given_at")
+    .eq("festival_id", festivalId)
+    .order("given_at", { ascending: false });
+  const consentBy = new Map<string, "granted" | "refused">();
+  for (const c of consents ?? []) {
+    if (!consentBy.has(c.competitor_id)) {
+      consentBy.set(c.competitor_id, c.media_consent as "granted" | "refused");
+    }
+  }
+
   return (data ?? []).map((e) => {
     const cls = Array.isArray(e.classes) ? e.classes[0] : e.classes;
     const comp = Array.isArray(e.competitors)
@@ -187,6 +202,7 @@ export async function getAdminEntries(festivalId: string): Promise<AdminEntry[]>
       competitor: comp ? `${comp.first_name} ${comp.last_name}` : "",
       piece: e.piece_title,
       createdAt: e.created_at,
+      mediaConsent: consentBy.get(e.competitor_id) ?? null,
     };
   });
 }

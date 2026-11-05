@@ -22,6 +22,7 @@ export default async function AdminSettings({
           festivalSlug={festival.slug}
           name={festival.name}
           contactEmail={festival.contact_email ?? ""}
+          photoPolicy={festival.photo_policy ?? ""}
           theme={theme}
         />
       ) : (

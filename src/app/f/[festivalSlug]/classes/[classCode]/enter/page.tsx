@@ -64,6 +64,7 @@ export default async function EnterClass({
           ageMin={cls.age_min}
           ageMax={cls.age_max}
           competitors={competitors}
+          photoPolicy={festival.photo_policy}
         />
       </Panel>
     </main>

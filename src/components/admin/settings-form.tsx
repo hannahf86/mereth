@@ -25,16 +25,19 @@ export function SettingsForm({
   festivalSlug,
   name: initialName,
   contactEmail: initialEmail,
+  photoPolicy: initialPhotoPolicy,
   theme,
 }: {
   festivalSlug: string;
   name: string;
   contactEmail: string;
+  photoPolicy: string;
   theme: Record<string, string>;
 }) {
   const router = useRouter();
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
+  const [photoPolicy, setPhotoPolicy] = useState(initialPhotoPolicy);
   const [colors, setColors] = useState<Record<string, string>>(() =>
     Object.fromEntries(THEME_FIELDS.map((f) => [f.token, theme[f.token]])),
   );
@@ -49,6 +52,7 @@ export function SettingsForm({
     const res = await updateFestivalSettings(festivalSlug, {
       name,
       contactEmail: email,
+      photoPolicy,
       theme: colors,
     });
     if (res.ok) {
@@ -84,6 +88,20 @@ export function SettingsForm({
           className={fieldClass}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+
+      <div className="flex flex-col gap-xs">
+        <label htmlFor="photoPolicy" className={labelClass}>
+          Photography policy (shown at entry)
+        </label>
+        <textarea
+          id="photoPolicy"
+          rows={2}
+          className={`${fieldClass} min-h-[72px]`}
+          value={photoPolicy}
+          onChange={(e) => setPhotoPolicy(e.target.value)}
+          placeholder="e.g. Images may be used to promote the festival."
         />
       </div>
 
