@@ -17,10 +17,15 @@ values
    'authenticated', 'authenticated', 'helen.clarke@example.com', '', now(), now(), now(),
    '{"provider":"email","providers":["email"]}', '{"full_name":"Helen Clarke"}');
 
+-- The handle_new_user trigger (migration 20261104200000) auto-creates a profile
+-- for each auth.users row above, so upsert here: the seed stays correct whether
+-- or not that trigger is present.
 insert into public.profiles (id, full_name, email) values
   ('11111111-1111-4111-8111-111111111111', 'Rachel Howard', 'rachel.howard@example.com'),
   ('22222222-2222-4222-8222-222222222222', 'Sarah Bennett', 'sarah.bennett@example.com'),
-  ('33333333-3333-4333-8333-333333333333', 'Helen Clarke', 'helen.clarke@example.com');
+  ('33333333-3333-4333-8333-333333333333', 'Helen Clarke', 'helen.clarke@example.com')
+on conflict (id) do update set
+  full_name = excluded.full_name, email = excluded.email;
 
 -- ---------- Disciplines (global reference) ----------
 insert into public.disciplines (id, name, sort_order) values
